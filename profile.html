@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="master.css">
+    <title>Lotus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <script src="./node_modules/axios/dist/axios.min.js"></script>
+    <style>
+        #post-textarea {
+            width: 100%;
+            height: 100px;
+            border-color: #dee2e6;
+            border-radius: 10px;
+            outline: none;
+            resize: none;
+        }
+        #editIcon {
+            font-size: 20px;
+            height: 40px;
+            width: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        #editIcon:hover {
+            color: #00a2ed;
+            transition: 0.3s;
+            background-color: #00395337;
+        }
+        #deleteIcon {
+            height: 40px;
+            width: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        #deleteIcon:hover {
+            color: #dd0000;
+            transition: 0.3s;
+            background-color: #00395337;
+        }
+        #add-post-icon-mobile {
+            display: inline-block !important;
+            z-index: 5;
+            color: #f17fb2;
+            font-size: 40px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            #container,
+            #container > div,
+            #container > div > div,
+            .mainDiv {
+                width: 95% !important;
+            }
+        }
+    </style>
+</head>
+<body style="background-color: #f0ecff;">
+        <!-- loader -->
+        <div id="loader" style="position: fixed; z-index: 1000; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: #94949491; padding: 3px; border-radius: 20px;">
+            <div class="lds-roller" bis_skin_checked="1"><div bis_skin_checked="1"></div><div bis_skin_checked="1"></div><div bis_skin_checked="1"></div><div bis_skin_checked="1"></div><div bis_skin_checked="1"></div><div bis_skin_checked="1"></div><div bis_skin_checked="1"></div><div bis_skin_checked="1"></div></div>
+        </div>
+        <!-- // loader // -->
+    <!-- LOGIN MODAL -->
+    <div class="modal fade" id="login-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Username:</label>
+                            <input type="text" class="form-control" id="recipient-name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="message-text" class="col-form-label">Password:</label>
+                            <input type="password" class="form-control" id="recipient-password">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="login-btn">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- // LOGIN MODAL // -->
+    <!-- REGISTER MODAL -->
+    <div class="modal fade" id="register-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Register A New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Name:</label>
+                            <input type="text" class="form-control" id="register-name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Username:</label>
+                            <input type="text" class="form-control" id="register-userName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="message-text" class="col-form-label">Password:</label>
+                            <input type="password" class="form-control" id="register-password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="message-text" class="col-form-label">Image:</label>
+                            <input type="file" class="form-control" id="register-image">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="register-btn">Register</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- // REGISTER MODAL // -->
+    <!-- POST MODAL -->
+    <div class="modal fade" id="post-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="post-modal-title">Create A New Post</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Title:</label>
+                            <input type="text" class="form-control" id="post-name">
+                            <input type="hidden" id="post-id-input">
+                        </div>
+                        <div class="mb-3">
+                            <textarea name="post-text" id="post-textarea" class="col-form-label"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Image:</label>
+                            <input type="file" class="form-control" id="post-image">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="create-post-btn">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- // POST MODAL // -->
+    <!-- DELETE MODAL -->
+    <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="post-modal-title">Are you sure you want to delete this post?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <input type="hidden" id="delete-input-id-post" value="">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="delete-post-btn" onclick="confirmPostDelete()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- // DELETE MODAL // -->
+    <div class="container"> 
+        <div class="d-flex justify-content-center">
+            <div class="col-9 mainDiv">
+                <nav class="navbar navbar-expand-lg bg-body-tertiary shadow rounded pt-3">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="home.html" style="display: flex; align-items: center;">
+                            <img src="./imgs/sablon-logotipa-beauty-lotus-flower-vektornaa-illustracia-v1_273663-original-removebg-preview.png" style="width: 30px;" alt="">
+                            Lotus
+                        </a>
+                        <!-- POST BUTTON -->
+                        <i class="fa-solid fa-circle-plus" style="display: none;" id="add-post-icon-mobile" onclick="addPostBtnClicked()" style="visibility: hidden;"></i>
+                        <!--// POST BUTTON // -->
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="home.html">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"style="cursor: pointer;" onclick="profileClicked()">Profile</a>
+                            </li>
+                        </ul>
+                        <div>
+                            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#login-modal" id="nav-login">Login</button>
+                            <button type="button" class="btn btn-outline-success" id="nav-register" data-bs-toggle="modal" data-bs-target="#register-modal">Register</button>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <img src="" alt="" id="nav-img" class="rounded-5" style="width: 40px; height: 40px; background-size: cover;">
+                            <p id="nav-name" class="mx-2 my-0 fw-bold"></p>
+                            <button type="button" class="btn btn-outline-danger" id="nav-logout">Logout</button>
+                        </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="height: 1000px;">
+        <div class="d-flex justify-content-center mt-5">
+            <div class="col-9 mainDiv">
+                <div class="card mb-3 shadow">
+                    <div class="" style="display: flex; justify-content: space-around;">
+                        <div class="">
+                            <img id="profileImage" src="" alt="" style="width: 120px; height: 120px; border-radius: 50%; margin-top: 10px; margin-left: 10px;">
+                        </div>
+                        <div class="d-flex flex-column justify-content-evenly" style="font-weight: 500; font-size: 20px;">
+                            <div id="profileEmail">
+                            </div>
+                            <div id="profileName">
+                            </div>
+                            <div id="profileUsername">
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column justify-content-evenly">
+                            <div class="number-info" style="color: rgb(172, 172, 172); font-weight: 100;">
+                                <span style="font-size: 50px; color: black;" id="postsCount"></span> Posts
+                            </div>
+                            <div class="number-info" style="color: rgb(172, 172, 172); font-weight: 100;">
+                                <span style="font-size: 50px; color: black;" id="commentsCount"></span> Comments
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5">
+                    <h1 id="postOwnerTitle"></h1>
+                </div>
+                <div id="cardsDiv" class="mt-5">
+                    <div class="card mb-3 shadow">
+                        <div class="card-header d-flex align-items-center">
+                            <div style='flex: 1;'>
+                                <img src="" alt="" style="width: 40px; height: 40px;" class="rounded-circle border border-2">
+                                <p class="d-inline fw-bold"></p>
+                            </div>
+                        </div>
+                        <div class="card-body" style="cursor: pointer;">
+                            <img src="" alt="" class="w-100 rounded">
+                            <span style="color: grey; font-weight: bold; font-size: 14px;"></span>
+                            <h5 class="card-title mt-1"></h5>
+                            <p class="card-text"></p>
+                            <hr>
+                            <footer>
+                                <i class="fa-solid fa-pen"></i>
+                                <span></span>
+                            </footer>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/gh/noumanqamar450/alertbox@main/version/1.0.2/alertbox.min.js"></script>
+</body>
+<script src="mainLogic.js"></script>
+<script src="profileScripts.js"></script>
